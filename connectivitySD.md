@@ -1,12 +1,10 @@
 # Connectivity Service – Solution Design (Mock)
 
-# Narrative
-
 **Problem**
 Operators ran product workflows such as issuance. Each workflow had to notify a growing set of third parties, and every client wanted their own. Each integration was bespoke code that reinvented scheduling, payload formatting and error handling. That took 5–6 days of development per connection, and every connection failed differently for the operators running the workflows.
 
 **Decision**
-Separate *whether* something is sent, *how* it is shaped, and *when and how* it is delivered:
+Separate *whether* something is sent, *how* it is shaped, and *when and how* it is delivered, and *How* the results are retrieved:
 - **Rules Engine** decides from product data whether a workflow triggers a connection.
 - **Decentralised Adaptor layer** is owned by a dedicated payload transformation team that ships independently.
 - **Connectivity Service** owns delivery, scheduling and error handling.
@@ -16,7 +14,7 @@ Each capability is built once: polling, batching, sync and async delivery, and s
 
 **Results**
 - **62 connections** delivered across three clients: 47 for our largest client, 11 and 4 for two others.
-- Development time per connection cut from **5–6 days to at most 1 day**. That saved roughly **250–310 engineer-days** (over an engineer-year), and the saving grows with every new connection.
+- Development time per connection cut from **5–6 days to at most 1 day (for initial build out)**.  That saved roughly **250–310 engineer-days** (over an engineer-year), and the saving grows with every new connection.
 - **Consistent operator experience:** delivery, retries and errors behave the same for every connection, so operators running issuance and other workflows see one pattern.
 - A new *kind* of capability is a one-off cost. A new *connection* is almost free, so growth no longer scales with engineering headcount.
 
@@ -81,7 +79,7 @@ sequenceDiagram
     CS->>CS: hasRequestTransform?
     CS->>DA: Product Information 
     
-    DA->>DA: Transform
+    DA->>DA: Transform 
     DA-->>CS: Request
     
     opt Sync Request and response cycle
@@ -94,8 +92,8 @@ sequenceDiagram
     CS->>DA: Response
     DA-->>CS: Platform Response
 
-    CS -->> WE: Response 
-    WE ->> WE: handleResponse
+    CS-->>WE: Response 
+    WE-->>WE: handleResponse
 ```
 
 ## Connection configuration data model
